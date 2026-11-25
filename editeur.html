@@ -94,14 +94,15 @@
         </div>
       </fieldset>
 
-      <fieldset>
-        <legend>Réseaux et liens</legend>
+            <fieldset>
+        <legend>Réseaux sociaux</legend>
+        <p class="hint">Collez l'adresse complète du profil. Le logo s'affiche seulement si le champ est rempli.</p>
         <div class="grid-2">
-          <label>YouTube (URL) <input data-path="socials.youtube"></label>
-          <label>Spotify (URL) <input data-path="socials.spotify"></label>
-          <label>Instagram (URL) <input data-path="socials.instagram"></label>
-          <label>Facebook (URL) <input data-path="socials.facebook"></label>
-          <label>Site web (URL) <input data-path="socials.website"></label>
+          <label>YouTube (Don patient muyumba TV) <input data-path="socials.youtube" placeholder="https://www.youtube.com/@monnom"></label>
+          <label>Instagram (Don patient muyumba) <input data-path="socials.instagram" placeholder="https://www.instagram.com/monnom"></label>
+          <label>Facebook (Don patient muyumba) <input data-path="socials.facebook" placeholder="https://www.facebook.com/monnom"></label>
+          
+          
         </div>
       </fieldset>
 
@@ -116,6 +117,14 @@
         <p class="hint">Pour l'extrait audio, placez le fichier .mp3 dans <code>assets/</code> et indiquez <code>assets/nom.mp3</code>.</p>
         <div id="list-albums"></div>
         <button type="button" class="btn btn-ghost" data-add="albums">+ Ajouter un titre ou album</button>
+      </fieldset>
+            <fieldset>
+        <legend>Extrait vidéo</legend>
+        <p class="hint">Deux possibilités : un lien YouTube (ex : https://youtu.be/xxxx), ou un fichier vidéo placé dans <code>assets/</code> (ex : assets/clip.mp4). Laissez le champ vide pour masquer la section.</p>
+        <label>Titre de l'extrait <input data-path="clip.titre" placeholder="Extrait du clip « Lumière »"></label>
+        <label>Vidéo (lien YouTube ou assets/clip.mp4) <input data-path="clip.video"></label>
+        <label>Image de couverture (facultatif, pour un fichier mp4) <input data-path="clip.poster" placeholder="assets/couverture.jpg"></label>
+        <label>Description <textarea data-path="clip.description" rows="2"></textarea></label>
       </fieldset>
 
       <fieldset>
@@ -170,6 +179,7 @@
   </main>
 
   <div class="toolbar">
+        <a href="index.html" class="btn btn-ghost">← Mon portfolio</a>
     <button type="button" class="btn btn-ghost" id="btnPreview">Aperçu</button>
     <button type="button" class="btn btn-primary" id="btnDownload">Télécharger data.js</button>
     <button type="button" class="btn btn-ghost" id="btnReload">Recharger data.js</button>
@@ -285,14 +295,16 @@
     };
 
     // Chargement : brouillon sauvegardé, sinon data.js
-    function normalize(src) {
-      const s = clone(src);
+       function normalize(src) {
+      const s = clone(src || {});
       s.personal = s.personal || {};
       s.citation = s.citation || {};
       s.socials = s.socials || {};
+      s.clip = s.clip || {};
       Object.keys(LISTS).forEach(k => { s[k] = s[k] || []; });
       return s;
     }
+  
 
     let state;
     try {
