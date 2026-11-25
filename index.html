@@ -9,6 +9,37 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500;1,600&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
   <style>
+    /* ===== Extrait vidéo ===== */
+.clip-wrap{max-width:900px;margin:0 auto}
+.clip-title{font-size:2rem;font-weight:600;text-align:center;margin-top:36px}
+.clip-player{
+  position:relative;aspect-ratio:16/9;border-radius:var(--radius);overflow:hidden;
+  background:var(--bg-2);border:1px solid var(--border);box-shadow:var(--shadow);
+}
+.clip-player iframe,.clip-player video{
+  position:absolute;inset:0;width:100%;height:100%;border:0;background:#000;
+}
+.clip-desc{text-align:center;color:var(--muted);margin-top:20px;white-space:pre-line}
+
+/* ===== Boutons des réseaux avec logos ===== */
+.socials{display:flex;justify-content:center;gap:14px;flex-wrap:wrap}
+.social{
+  display:inline-flex;align-items:center;gap:12px;
+  padding:12px 24px 12px 14px;border-radius:999px;
+  border:1px solid var(--border);background:var(--surface);
+  font-size:.9rem;font-weight:500;color:var(--text);transition:var(--t);
+}
+.social-ico{width:28px;height:28px;display:grid;place-items:center;flex-shrink:0}
+.social-ico svg{width:100%;height:100%;display:block}
+.social:hover{
+  transform:translateY(-3px);border-color:var(--gold);
+  box-shadow:0 12px 30px -12px rgba(217,184,104,.5);
+}
+#footerSocials{margin-bottom:22px}
+
+@media (max-width:760px){
+  .clip-title{font-size:1.6rem}
+}
     [hidden]{display:none!important}
     *{margin:0;padding:0;box-sizing:border-box}
 
@@ -349,6 +380,9 @@
       <a href="#apropos">À propos</a>
       <a href="#musique">Musique</a>
       <a href="#clip" hidden>Extrait vidéo</a>
+      <a href="#concerts">Concerts</a>
+      <a href="#medias">Journalisme</a>
+      <a href="#roles">Cinéma &amp; Théâtre</a>
       <a href="#parcours">Parcours</a>
       <a href="#contact">Contact</a>
     </nav>
@@ -364,6 +398,7 @@
       <p class="hero-tagline" id="heroTagline"></p>
       <div class="hero-buttons">
         <a href="#musique" class="btn btn-primary">Écouter ma musique</a>
+              <a href="#clip" hidden>Extrait vidéo</a>
         <a href="#contact" class="btn btn-ghost">Me contacter</a>
         <a id="cvBtn" class="btn btn-ghost" download hidden>Télécharger mon CV</a>
       </div>
@@ -417,6 +452,15 @@
     </div>
   </section>
 
+    <!-- Extrait vidéo -->
+  <section class="section" id="clip" hidden>
+    <div class="container clip-wrap">
+      <h2 class="section-title reveal">Extrait vidéo</h2>
+      <div class="clip-player reveal" id="clipPlayer"></div>
+      <h3 class="clip-title reveal" id="clipTitre"></h3>
+      <p class="clip-desc reveal" id="clipDesc"></p>
+    </div>
+  </section>
   <!-- Concerts -->
   <section class="section alt" id="concerts" hidden>
     <div class="container">
@@ -487,18 +531,19 @@
   <!-- Accès à l'éditeur -->
   <a href="editeur.html" class="edit-fab" title="Modifier mes informations">✎ Modifier</a>
 
-  <script src="data.js"></script>
+  <script src="datas.js"></script>
   <script>
-    /* ===== Utilitaires (sûrs : ignorent les éléments absents) ===== */
+        /* ===== Utilitaires ===== */
     const $ = id => document.getElementById(id);
     const put = (id, html) => { const el = $(id); if (el) el.innerHTML = html; };
     const txt = (id, t) => { const el = $(id); if (el) el.textContent = t; };
-    const setHidden = (id, hide) => { const el = $(id); if (el) el.hidden = hide; };
-    const esc = (s) => (s == null ? '' : String(s)).replace(/[&<>"']/g, c =>
+    const setHidden = (id, h) => { const el = $(id); if (el) el.hidden = h; };
+    const esc = s => (s == null ? '' : String(s)).replace(/[&<>"']/g, c =>
       ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
     const pct = v => Math.min(100, Math.max(0, parseInt(v, 10) || 0));
     const initialesDe = nom => (nom || 'P').split(/\s+/).filter(Boolean)
       .map(w => w[0]).slice(0, 2).join('').toUpperCase();
+    const lienComplet = u => /^(https?:\/\/|mailto:|tel:)/i.test(u) ? u : 'https://' + u;
     const KEY = 'portfolio-draft-musicien';
 
     /* ===== Démarrage ===== */
@@ -506,15 +551,14 @@
       try {
         renderAll(getData());
       } catch (e) {
-        console.error('Erreur lors de l\'affichage du portfolio :', e);
+        console.error('Erreur d\'affichage :', e);
       }
-      // Ces deux fonctions s'exécutent même si l'affichage a rencontré une erreur
       initNav();
       initReveal();
       initPlayers();
     });
 
-    // Si l'URL contient ?preview=1, on affiche le brouillon de l'éditeur
+    // Avec ?preview=1, affiche le brouillon de l'éditeur
     function getData() {
       if (new URLSearchParams(location.search).has('preview')) {
         try {
@@ -534,7 +578,7 @@
     const periodeTag = (type, extra) =>
       `<span class="period">${esc(type)}${extra ? ' · ' + esc(extra) : ''}</span>`;
 
-    /* ===== Icônes officielles des réseaux ===== */
+    /* ===== Logos des réseaux ===== */
     const ICONES = {
       youtube: `<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="#FF0000" d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.6 12 3.6 12 3.6s-7.5 0-9.4.5A3 3 0 0 0 .5 6.2 31 31 0 0 0 0 12a31 31 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.1c1.9.5 9.4.5 9.4.5s7.5 0 9.4-.5a3 3 0 0 0 2.1-2.1A31 31 0 0 0 24 12a31 31 0 0 0-.5-5.8z"/><path fill="#fff" d="M9.6 15.6V8.4L15.8 12z"/></svg>`,
       instagram: `<svg viewBox="0 0 24 24" aria-hidden="true"><defs><linearGradient id="igGrad" x1="0" y1="1" x2="1" y2="0"><stop offset="0" stop-color="#feda75"/><stop offset=".35" stop-color="#fa7e1e"/><stop offset=".6" stop-color="#d62976"/><stop offset="1" stop-color="#4f5bd5"/></linearGradient></defs><rect x="2" y="2" width="20" height="20" rx="6" fill="url(#igGrad)"/><circle cx="12" cy="12" r="4.6" fill="none" stroke="#fff" stroke-width="2"/><circle cx="17.3" cy="6.7" r="1.3" fill="#fff"/></svg>`,
@@ -551,10 +595,6 @@
       ['website', 'Site web']
     ];
 
-    // Ajoute https:// si l'adresse n'en a pas
-    const lienComplet = u => /^(https?:\/\/|mailto:|tel:)/i.test(u) ? u : 'https://' + u;
-
-    // Boutons des réseaux : section Contact et pied de page
     function renderSocials(soc) {
       const html = RESEAUX
         .filter(([k]) => soc[k])
@@ -567,13 +607,12 @@
       put('footerSocials', html);
     }
 
-    // Identifiant d'une vidéo YouTube (watch, youtu.be, shorts, embed)
+    /* ===== Extrait vidéo ===== */
     function youtubeId(url = '') {
       const m = url.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|shorts\/))([\w-]{11})/);
       return m ? m[1] : '';
     }
 
-    // Extrait vidéo : YouTube si lien YouTube, sinon fichier local
     function renderClip(c) {
       const ok = !!c.video;
       show('clip', ok);
@@ -600,7 +639,8 @@
       txt('heroNom', p.nom || '');
       txt('heroTagline', p.tagline || '');
       const roles = (p.titre || '').split('|').map(s => s.trim()).filter(Boolean);
-      if ($('heroTitre')) typeRoles(roles, $('heroTitre'));
+      const heroTitre = $('heroTitre');
+      if (heroTitre) typeRoles(roles, heroTitre);
 
       const cv = $('cvBtn');
       if (cv) { cv.hidden = !p.cv; if (p.cv) cv.href = p.cv; }
@@ -746,7 +786,7 @@
         p.localisation && `<div class="contact-item"><span class="ci-label">Localisation</span><span class="val">${esc(p.localisation)}</span></div>`
       ].filter(Boolean).join(''));
 
-      // Réseaux (contact et pied de page)
+      // Réseaux
       renderSocials(d.socials || {});
 
       txt('footerText', `© ${new Date().getFullYear()} ${p.nom || ''}. Tous droits réservés.`);
@@ -785,7 +825,6 @@
         burger.classList.remove('active');
       }));
 
-      // Surligne le lien de la section visible
       const io = new IntersectionObserver(entries => {
         entries.forEach(e => {
           if (e.isIntersecting) {
