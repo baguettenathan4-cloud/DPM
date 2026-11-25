@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Portfolio — musicien, compositeur, journaliste, chroniqueur et comédien">
+  <title>Portfolio</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500;1,600&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <div class="glow g1"></div>
+  <div class="glow g2"></div>
+
+  <!-- Navigation -->
+  <header class="navbar" id="navbar">
+    <a href="#accueil" class="logo" id="logo"></a>
+    <nav class="nav-links" id="navLinks">
+      <a href="#apropos">À propos</a>
+      <a href="#musique">Musique</a>
+      <a href="#concerts">Concerts</a>
+      <a href="#medias">Journalisme</a>
+      <a href="#roles">Cinéma &amp; Théâtre</a>
+      <a href="#parcours">Parcours</a>
+      <a href="#contact">Contact</a>
+    </nav>
+    <button class="burger" id="burger" aria-label="Ouvrir le menu"><span></span><span></span></button>
+  </header>
+
+  <!-- Accueil -->
+  <section class="hero" id="accueil">
+    <div class="hero-content reveal">
+      <p class="hero-eyebrow">Bienvenue</p>
+      <h1 id="heroNom"></h1>
+      <h2 class="hero-titre"><span id="heroTitre"></span><span class="cursor"></span></h2>
+      <p class="hero-tagline" id="heroTagline"></p>
+      <div class="hero-buttons">
+        <a href="#musique" class="btn btn-primary">Écouter ma musique</a>
+        <a href="#contact" class="btn btn-ghost">Me contacter</a>
+        <a id="cvBtn" class="btn btn-ghost" download hidden>Télécharger mon CV</a>
+      </div>
+    </div>
+    <div class="hero-photo reveal" id="heroPhoto"></div>
+    <a href="#citation" class="scroll-down" aria-label="Défiler">↓</a>
+  </section>
+
+  <!-- Citation -->
+  <section class="verse" id="citation">
+    <div class="container reveal">
+      <p class="verse-text" id="verseText"></p>
+      <p class="verse-ref" id="verseRef"></p>
+    </div>
+  </section>
+
+  <!-- À propos -->
+  <section class="section" id="apropos">
+    <div class="container">
+      <h2 class="section-title reveal">À propos</h2>
+      <div class="about-grid">
+        <p class="about-text reveal" id="aboutText"></p>
+        <div class="about-infos reveal" id="aboutInfos"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Domaines -->
+  <section class="section alt" id="domaines">
+    <div class="container">
+      <h2 class="section-title reveal">Mes domaines</h2>
+      <div class="grid-cards" id="domainesGrid"></div>
+    </div>
+  </section>
+
+  <!-- Musique -->
+  <section class="section" id="musique">
+    <div class="container">
+      <h2 class="section-title reveal">Musique</h2>
+      <div class="projects-grid" id="albumsGrid"></div>
+    </div>
+  </section>
+
+  <!-- Concerts -->
+  <section class="section alt" id="concerts">
+    <div class="container">
+      <h2 class="section-title reveal">Concerts &amp; événements</h2>
+      <div class="concerts-list" id="concertsList"></div>
+    </div>
+  </section>
+
+  <!-- Journalisme -->
+  <section class="section" id="medias">
+    <div class="container">
+      <h2 class="section-title reveal">Journalisme &amp; chroniques</h2>
+      <div class="grid-cards" id="mediasGrid"></div>
+    </div>
+  </section>
+
+  <!-- Cinéma & théâtre -->
+  <section class="section alt" id="roles">
+    <div class="container">
+      <h2 class="section-title reveal">Cinéma &amp; théâtre</h2>
+      <div class="grid-cards" id="rolesGrid"></div>
+    </div>
+  </section>
+
+  <!-- Compétences -->
+  <section class="section" id="competences">
+    <div class="container">
+      <h2 class="section-title reveal">Compétences</h2>
+      <div class="skills-grid" id="skillsGrid"></div>
+      <h3 class="sub-title reveal" id="langTitle">Langues</h3>
+      <div class="langues" id="langList"></div>
+    </div>
+  </section>
+
+  <!-- Parcours -->
+  <section class="section alt" id="parcours">
+    <div class="container">
+      <h2 class="section-title reveal">Parcours</h2>
+      <div class="timeline" id="expTimeline"></div>
+      <h3 class="sub-title reveal" id="formTitle">Formation</h3>
+      <div class="formations" id="formList"></div>
+    </div>
+  </section>
+
+  <!-- Témoignages -->
+  <section class="section" id="temoignages">
+    <div class="container">
+      <h2 class="section-title reveal">Ils en parlent</h2>
+      <div class="quotes" id="quotesGrid"></div>
+    </div>
+  </section>
+
+  <!-- Contact -->
+  <section class="section contact" id="contact">
+    <div class="container">
+      <h2 class="section-title reveal">Travaillons ensemble</h2>
+      <p class="contact-text reveal">Pour un concert, une interview, un reportage, un projet musical ou un rôle, je serai heureux d'échanger avec vous.</p>
+      <div class="contact-links reveal" id="contactLinks"></div>
+      <div class="socials reveal" id="socialLinks"></div>
+    </div>
+  </section>
+
+  <footer class="footer"><p id="footerText"></p></footer>
+
+  <script src="data.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Éditeur de portfolio</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .editor{max-width:920px;margin:0 auto;padding:130px 24px 150px}
+    .editor h1{font-size:2.8rem;font-weight:600;margin-bottom:8px}
+    .intro{color:var(--muted);margin-bottom:40px;font-size:.95rem}
+    fieldset{
+      border:1px solid var(--border);border-radius:var(--radius);
+      padding:28px;margin-bottom:32px;background:var(--surface);
+    }
+    legend{
+      font-family:'Cormorant Garamond',serif;font-size:1.5rem;font-weight:600;
+      color:var(--gold);padding:0 12px;
+    }
+    label{display:block;margin-bottom:16px;font-size:.85rem;color:var(--muted)}
+    input,textarea{
+      width:100%;margin-top:6px;padding:12px 14px;
+      background:var(--bg-2);border:1px solid var(--border);border-radius:12px;
+      color:var(--text);font:inherit;
+    }
+    input:focus,textarea:focus{outline:none;border-color:var(--gold)}
+    textarea{min-height:90px;resize:vertical}
+    .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:0 20px}
+    .hint{font-size:.78rem;color:var(--muted);margin:-8px 0 16px}
+    .item-card{border:1px dashed var(--border);border-radius:16px;padding:20px;margin-bottom:18px}
+    .item-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;color:var(--gold)}
+    .btn-small{
+      padding:8px 16px;font-size:.78rem;border-radius:999px;cursor:pointer;
+      background:transparent;color:#ff8a8a;border:1px solid rgba(255,138,138,.4);
+    }
+    .toolbar{
+      position:fixed;bottom:24px;left:50%;transform:translateX(-50%);
+      display:flex;gap:10px;flex-wrap:wrap;justify-content:center;align-items:center;
+      padding:12px;width:max-content;max-width:94vw;
+      background:rgba(16,22,40,.94);backdrop-filter:blur(14px);
+      border:1px solid var(--border);border-radius:999px;box-shadow:var(--shadow);z-index:200;
+    }
+    .toolbar .btn{padding:10px 20px;font-size:.82rem}
+    #status{font-size:.78rem;color:var(--muted);padding:0 10px}
+    @media (max-width:640px){.grid-2{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+
+  <div class="glow g1"></div>
+  <div class="glow g2"></div>
+
+  <main class="editor">
+    <h1>Éditeur de portfolio</h1>
+    <p class="intro">
+      Remplissez les champs ci-dessous. Vos modifications sont sauvegardées automatiquement dans ce navigateur.
+      Quand vous êtes satisfait, cliquez sur <strong>« Télécharger data.js »</strong> puis remplacez le fichier
+      <code>data.js</code> de votre projet. Une section vide sera automatiquement masquée sur le site.
+    </p>
+
+    <form id="form" onsubmit="return false">
+
+      <fieldset>
+        <legend>Identité</legend>
+        <div class="grid-2">
+          <label>Nom complet <input data-path="personal.nom"></label>
+          <label>Ministère / engagement <input data-path="personal.ministere" placeholder="Louange et adoration"></label>
+        </div>
+        <label>Titre(s) <input data-path="personal.titre" placeholder="Musicien | Compositeur | Journaliste | Chroniqueur | Comédien"></label>
+        <p class="hint">Plusieurs titres séparés par « | » : ils s'affichent en animation.</p>
+        <label>Phrase d'accroche <textarea data-path="personal.tagline" rows="2"></textarea></label>
+        <div class="grid-2">
+          <label>Photo (chemin ou URL) <input data-path="personal.photo" placeholder="assets/photo.jpg"></label>
+          <label>CV en PDF (chemin ou URL) <input data-path="personal.cv" placeholder="assets/cv.pdf"></label>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>Citation d'accueil</legend>
+        <label>Verset ou citation <textarea data-path="citation.texte" rows="2" placeholder="Chantez à l'Éternel un cantique nouveau…"></textarea></label>
+        <label>Référence <input data-path="citation.reference" placeholder="Psaume 96:1"></label>
+      </fieldset>
+
+      <fieldset>
+        <legend>Présentation et contact</legend>
+        <label>Texte « À propos » <textarea data-path="about" rows="5"></textarea></label>
+        <div class="grid-2">
+          <label>Localisation <input data-path="personal.localisation"></label>
+          <label>Email <input type="email" data-path="personal.email"></label>
+          <label>Téléphone <input data-path="personal.telephone"></label>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>Réseaux et liens</legend>
+        <div class="grid-2">
+          <label>YouTube (URL) <input data-path="socials.youtube"></label>
+          <label>Spotify (URL) <input data-path="socials.spotify"></label>
+          <label>Instagram (URL) <input data-path="socials.instagram"></label>
+          <label>Facebook (URL) <input data-path="socials.facebook"></label>
+          <label>Site web (URL) <input data-path="socials.website"></label>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>Domaines</legend>
+        <div id="list-domaines"></div>
+        <button type="button" class="btn btn-ghost" data-add="domaines">+ Ajouter un domaine</button>
+      </fieldset>
+
+      <fieldset>
+        <legend>Musique</legend>
+        <p class="hint">Pour l'extrait audio, placez le fichier .mp3 dans <code>assets/</code> et indiquez <code>assets/nom.mp3</code>.</p>
+        <div id="list-albums"></div>
+        <button type="button" class="btn btn-ghost" data-add="albums">+ Ajouter un titre ou album</button>
+      </fieldset>
+
+      <fieldset>
+        <legend>Concerts et événements</legend>
+        <div id="list-concerts"></div>
+        <button type="button" class="btn btn-ghost" data-add="concerts">+ Ajouter un concert</button>
+      </fieldset>
+
+      <fieldset>
+        <legend>Journalisme et chroniques</legend>
+        <div id="list-medias"></div>
+        <button type="button" class="btn btn-ghost" data-add="medias">+ Ajouter une publication</button>
+      </fieldset>
+
+      <fieldset>
+        <legend>Cinéma et théâtre</legend>
+        <div id="list-roles"></div>
+        <button type="button" class="btn btn-ghost" data-add="roles">+ Ajouter un rôle</button>
+      </fieldset>
+
+      <fieldset>
+        <legend>Compétences</legend>
+        <div id="list-skills"></div>
+        <button type="button" class="btn btn-ghost" data-add="skills">+ Ajouter une compétence</button>
+      </fieldset>
+
+      <fieldset>
+        <legend>Langues</legend>
+        <div id="list-langues"></div>
+        <button type="button" class="btn btn-ghost" data-add="langues">+ Ajouter une langue</button>
+      </fieldset>
+
+      <fieldset>
+        <legend>Expériences professionnelles</legend>
+        <div id="list-experiences"></div>
+        <button type="button" class="btn btn-ghost" data-add="experiences">+ Ajouter une expérience</button>
+      </fieldset>
+
+      <fieldset>
+        <legend>Formations</legend>
+        <div id="list-formations"></div>
+        <button type="button" class="btn btn-ghost" data-add="formations">+ Ajouter une formation</button>
+      </fieldset>
+
+      <fieldset>
+        <legend>Témoignages</legend>
+        <div id="list-temoignages"></div>
+        <button type="button" class="btn btn-ghost" data-add="temoignages">+ Ajouter un témoignage</button>
+      </fieldset>
+
+    </form>
+  </main>
+
+  <div class="toolbar">
+    <button type="button" class="btn btn-ghost" id="btnPreview">Aperçu</button>
+    <button type="button" class="btn btn-primary" id="btnDownload">Télécharger data.js</button>
+    <button type="button" class="btn btn-ghost" id="btnReload">Recharger data.js</button>
+    <span id="status"></span>
+  </div>
+
+  <script src="data.js"></script>
+  <script>
+    const KEY = 'portfolio-draft-musicien';
+    const $ = id => document.getElementById(id);
+    const clone = o => JSON.parse(JSON.stringify(o));
+    const esc = (s = '') => String(s).replace(/[&<>"']/g, c =>
+      ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
+
+    // Configuration des listes dynamiques
+    const LISTS = {
+      domaines: {
+        label: 'Domaine',
+        fields: [
+          { key: 'icone', label: 'Icône (emoji, ex : 🎵)' },
+          { key: 'titre', label: 'Titre' },
+          { key: 'description', label: 'Description', type: 'textarea' }
+        ],
+        empty: { icone: '', titre: '', description: '' }
+      },
+      albums: {
+        label: 'Titre ou album',
+        fields: [
+          { key: 'titre', label: 'Titre' },
+          { key: 'type', label: 'Type (Album, EP, Single…)' },
+          { key: 'annee', label: 'Année' },
+          { key: 'pochette', label: 'Pochette (chemin ou URL, facultatif)' },
+          { key: 'audio', label: 'Extrait audio (assets/nom.mp3 ou URL, facultatif)' },
+          { key: 'lien', label: 'Lien d\'écoute (Spotify, YouTube…)' }
+        ],
+        empty: { titre: '', type: '', annee: '', pochette: '', audio: '', lien: '' }
+      },
+      concerts: {
+        label: 'Concert',
+        fields: [
+          { key: 'date', label: 'Date (ex : 14 juin 2025)' },
+          { key: 'evenement', label: 'Événement' },
+          { key: 'lieu', label: 'Lieu' }
+        ],
+        empty: { date: '', evenement: '', lieu: '' }
+      },
+      medias: {
+        label: 'Publication',
+        fields: [
+          { key: 'titre', label: 'Titre de l\'article ou de l\'émission' },
+          { key: 'media', label: 'Média / journal / radio' },
+          { key: 'type', label: 'Type (Reportage, Interview, Chronique…)' },
+          { key: 'date', label: 'Date ou année' },
+          { key: 'image', label: 'Image (chemin ou URL, facultatif)' },
+          { key: 'lien', label: 'Lien (facultatif)' }
+        ],
+        empty: { titre: '', media: '', type: '', date: '', image: '', lien: '' }
+      },
+      roles: {
+        label: 'Rôle',
+        fields: [
+          { key: 'titre', label: 'Personnage ou rôle' },
+          { key: 'production', label: 'Production / film / pièce' },
+          { key: 'type', label: 'Type (Film, Théâtre, Série, Court-métrage…)' },
+          { key: 'annee', label: 'Année' },
+          { key: 'lien', label: 'Lien (facultatif)' }
+        ],
+        empty: { titre: '', production: '', type: '', annee: '', lien: '' }
+      },
+      skills: {
+        label: 'Compétence',
+        fields: [
+          { key: 'nom', label: 'Nom de la compétence' },
+          { key: 'niveau', label: 'Niveau (0 à 100)', type: 'number' }
+        ],
+        empty: { nom: '', niveau: 80 }
+      },
+      langues: {
+        label: 'Langue',
+        fields: [
+          { key: 'nom', label: 'Langue' },
+          { key: 'niveau', label: 'Niveau (ex : Natif, C1, B2)' }
+        ],
+        empty: { nom: '', niveau: '' }
+      },
+      experiences: {
+        label: 'Expérience',
+        fields: [
+          { key: 'poste', label: 'Poste' },
+          { key: 'entreprise', label: 'Structure / entreprise' },
+          { key: 'periode', label: 'Période (ex : 2022 — Aujourd\'hui)' },
+          { key: 'description', label: 'Description (une ligne par point)', type: 'textarea' }
+        ],
+        empty: { poste: '', entreprise: '', periode: '', description: '' }
+      },
+      formations: {
+        label: 'Formation',
+        fields: [
+          { key: 'diplome', label: 'Diplôme' },
+          { key: 'etablissement', label: 'Établissement' },
+          { key: 'periode', label: 'Période' }
+        ],
+        empty: { diplome: '', etablissement: '', periode: '' }
+      },
+      temoignages: {
+        label: 'Témoignage',
+        fields: [
+          { key: 'texte', label: 'Texte du témoignage', type: 'textarea' },
+          { key: 'auteur', label: 'Auteur (nom, fonction)' }
+        ],
+        empty: { texte: '', auteur: '' }
+      }
+    };
+
+    // Chargement : brouillon sauvegardé, sinon data.js
+    function normalize(src) {
+      const s = clone(src);
+      s.personal = s.personal || {};
+      s.citation = s.citation || {};
+      s.socials = s.socials || {};
+      Object.keys(LISTS).forEach(k => { s[k] = s[k] || []; });
+      return s;
+    }
+
+    let state;
+    try {
+      const saved = JSON.parse(localStorage.getItem(KEY));
+      state = normalize(saved || PORTFOLIO_DATA);
+    } catch (e) {
+      state = normalize(PORTFOLIO_DATA);
+    }
+
+    const getPath = (obj, path) => path.split('.').reduce((o, k) => o?.[k], obj);
+    const setPath = (obj, path, val) => {
+      const keys = path.split('.');
+      const last = keys.pop();
+      keys.reduce((o, k) => o[k], obj)[last] = val;
+    };
+
+    function persist() {
+      try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {}
+      $('status').textContent = 'Sauvegardé automatiquement';
+    }
+
+    function fillSimpleFields() {
+      document.querySelectorAll('[data-path]').forEach(el => {
+        el.value = getPath(state, el.dataset.path) ?? '';
+      });
+    }
+
+    function fieldHTML(f, value, attrs) {
+      const input = f.type === 'textarea'
+        ? `<textarea ${attrs} rows="3">${esc(value)}</textarea>`
+        : `<input type="${f.type === 'number' ? 'number' : 'text'}" ${f.type === 'number' ? 'min="0" max="100"' : ''} ${attrs} value="${esc(value)}">`;
+      return `<label>${f.label}${input}</label>`;
+    }
+
+    function renderList(key) {
+      const cfg = LISTS[key];
+      const items = state[key] || [];
+      $('list-' + key).innerHTML = items.map((item, idx) => `
+        <div class="item-card">
+          <div class="item-head">
+            <strong>${cfg.label} ${idx + 1}</strong>
+            <button type="button" class="btn-small" data-remove="${key}" data-index="${idx}">Supprimer</button>
+          </div>
+          ${cfg.fields.map(f => fieldHTML(
+            f,
+            item[f.key] ?? '',
+            `data-list="${key}" data-index="${idx}" data-field="${f.key}"`
+          )).join('')}
+        </div>`).join('') || '<p class="muted">Aucun élément pour le moment.</p>';
+    }
+
+    function renderAllLists() {
+      Object.keys(LISTS).forEach(renderList);
+    }
+
+    // Saisie dans les champs simples et les listes
+    $('form').addEventListener('input', e => {
+      const t = e.target;
+      if (t.dataset.path) {
+        setPath(state, t.dataset.path, t.value);
+      } else if (t.dataset.list) {
+        const item = state[t.dataset.list][Number(t.dataset.index)];
+        item[t.dataset.field] = t.type === 'number' ? Number(t.value) : t.value;
+      } else {
+        return;
+      }
+      persist();
+    });
+
+    // Ajout et suppression d'éléments
+    document.addEventListener('click', e => {
+      const add = e.target.closest('[data-add]');
+      const remove = e.target.closest('[data-remove]');
+
+      if (add) {
+        const key = add.dataset.add;
+        state[key].push({ ...LISTS[key].empty });
+        renderList(key);
+        persist();
+      }
+      if (remove && confirm('Supprimer cet élément ?')) {
+        const key = remove.dataset.remove;
+        state[key].splice(Number(remove.dataset.index), 1);
+        renderList(key);
+        persist();
+      }
+    });
+
+    // Barre d'actions
+    $('btnPreview').addEventListener('click', () => {
+      persist();
+      window.open('index.html?preview=1', '_blank');
+    });
+
+    $('btnDownload').addEventListener('click', () => {
+      const content = `// Données du portfolio — généré par l'éditeur\nconst PORTFOLIO_DATA = ${JSON.stringify(state, null, 2)};\n`;
+      const url = URL.createObjectURL(new Blob([content], { type: 'text/javascript' }));
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'data.js';
+      a.click();
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+      $('status').textContent = 'data.js téléchargé ✔';
+    });
+
+    $('btnReload').addEventListener('click', () => {
+      if (confirm('Remplacer le brouillon par le contenu actuel de data.js ?')) {
+        state = normalize(PORTFOLIO_DATA);
+        persist();
+        fillSimpleFields();
+        renderAllLists();
+      }
+    });
+
+    // Initialisation
+    fillSimpleFields();
+    renderAllLists();
+    $('status').textContent = 'Prêt';
+  </script>
+</body>
+</html>
