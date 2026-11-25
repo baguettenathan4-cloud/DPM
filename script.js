@@ -42,6 +42,61 @@ function renderAll(d) {
 
   document.title = `${p.nom || 'Portfolio'}${p.titre ? ' — ' + p.titre.split('|')[0].trim() : ''}`;
   $('logo').textContent = initiales;
+      /* Icônes officielles des réseaux */
+    const ICONES = {
+      youtube: `<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="#FF0000" d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.6 12 3.6 12 3.6s-7.5 0-9.4.5A3 3 0 0 0 .5 6.2 31 31 0 0 0 0 12a31 31 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.1c1.9.5 9.4.5 9.4.5s7.5 0 9.4-.5a3 3 0 0 0 2.1-2.1A31 31 0 0 0 24 12a31 31 0 0 0-.5-5.8z"/><path fill="#fff" d="M9.6 15.6V8.4L15.8 12z"/></svg>`,
+      instagram: `<svg viewBox="0 0 24 24" aria-hidden="true"><defs><linearGradient id="igGrad" x1="0" y1="1" x2="1" y2="0"><stop offset="0" stop-color="#feda75"/><stop offset=".35" stop-color="#fa7e1e"/><stop offset=".6" stop-color="#d62976"/><stop offset="1" stop-color="#4f5bd5"/></linearGradient></defs><rect x="2" y="2" width="20" height="20" rx="6" fill="url(#igGrad)"/><circle cx="12" cy="12" r="4.6" fill="none" stroke="#fff" stroke-width="2"/><circle cx="17.3" cy="6.7" r="1.3" fill="#fff"/></svg>`,
+      facebook: `<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="12" fill="#1877F2"/><path fill="#fff" d="M16.7 15.5l.5-3.3h-3.2V10c0-.9.4-1.8 1.9-1.8h1.5V5.4s-1.4-.2-2.7-.2c-2.7 0-4.5 1.6-4.5 4.6v2.7H7v3.3h3.1V24h3.8v-8.5z"/></svg>`,
+      spotify: `<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="12" fill="#1DB954"/><g fill="none" stroke="#0a0e1a" stroke-width="2" stroke-linecap="round"><path d="M5.5 9.5c4-1.3 9.5-1 13 1"/><path d="M6.5 13c3.5-1 8-.7 11 1"/><path d="M7.5 16.2c2.8-.8 6-.5 8.5.9"/></g></svg>`,
+      website: `<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="9"/><ellipse cx="12" cy="12" rx="4" ry="9"/><path d="M3 12h18"/></svg>`
+    };
+
+    const RESEAUX = [
+      ['youtube', 'YouTube'],
+      ['instagram', 'Instagram'],
+      ['facebook', 'Facebook'],
+      ['spotify', 'Spotify'],
+      ['website', 'Site web']
+    ];
+
+    // Ajoute https:// si l'utilisateur a tapé une adresse sans protocole
+    const lienComplet = u => /^(https?:\/\/|mailto:|tel:)/i.test(u) ? u : 'https://' + u;
+
+    // Affiche les boutons des réseaux (dans la section contact et le pied de page)
+    function renderSocials(soc) {
+      const html = RESEAUX
+        .filter(([k]) => soc[k])
+        .map(([k, label]) => `
+          <a class="social social-${k}" href="${esc(lienComplet(soc[k]))}" target="_blank" rel="noopener noreferrer" title="${label}">
+            <span class="social-ico">${ICONES[k]}</span>
+            <span>${label}</span>
+          </a>`).join('');
+      $('socialLinks').innerHTML = html;
+      $('footerSocials').innerHTML = html;
+    }
+
+    // Extrait l'identifiant d'une vidéo YouTube (watch, youtu.be, shorts, embed)
+    function youtubeId(url = '') {
+      const m = url.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|shorts\/))([\w-]{11})/);
+      return m ? m[1] : '';
+    }
+
+    // Affiche l'extrait : lecteur YouTube si lien YouTube, sinon lecteur vidéo local
+    function renderClip(c) {
+      const hasClip = !!c.video;
+      show('clip', hasClip);
+      if (!hasClip) {
+        $('clipPlayer').innerHTML = '';
+        return;
+      }
+      const yt = youtubeId(c.video);
+      $('clipPlayer').innerHTML = yt
+        ? `<iframe src="https://www.youtube-nocookie.com/embed/${yt}" title="${esc(c.titre || 'Extrait vidéo')}" allow="accelerometer; encrypted-media; gyroscope; picture-in-picture" allowfullscreen loading="lazy"></iframe>`
+        : `<video controls playsinline preload="metadata" ${c.poster ? `poster="${esc(c.poster)}"` : ''} src="${esc(c.video)}"></video>`;
+      $('clipTitre').textContent = c.titre || '';
+      $('clipTitre').hidden = !c.titre;
+      $('clipDesc').textContent = c.description || '';
+    }
 
   // Accueil
   $('heroNom').textContent = p.nom || '';
