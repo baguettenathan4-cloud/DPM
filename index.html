@@ -590,11 +590,35 @@
       ['website', 'Site web']
     ];
 
+        // Domaines acceptés pour chaque réseau
+    const DOMAINES = {
+      youtube: ['youtube.com', 'youtu.be'],
+      instagram: ['instagram.com'],
+      facebook: ['facebook.com', 'fb.com'],
+      spotify: ['spotify.com']
+    };
+
+    // Retourne une adresse valide pour ce réseau, sinon une chaîne vide
+    function lienReseau(k, u) {
+      u = String(u || '').trim();
+      if (!u || /\s/.test(u)) return '';
+      if (!/^https?:\/\//i.test(u)) u = 'https://' + u;
+      try {
+        const host = new URL(u).hostname.replace(/^www\./, '').toLowerCase();
+        if (k === 'website') return u;
+        const ok = (DOMAINES[k] || []).some(d => host === d || host.endsWith('.' + d));
+        return ok ? u : '';
+      } catch (e) {
+        return '';
+      }
+    }
+
     function renderSocials(soc) {
       const html = RESEAUX
-        .filter(([k]) => soc[k])
-        .map(([k, label]) => `
-          <a class="social social-${k}" href="${esc(lienComplet(soc[k]))}" target="_blank" rel="noopener noreferrer" title="${label}">
+        .map(([k, label]) => [k, label, lienReseau(k, soc[k])])
+        .filter(([, , url]) => url)
+        .map(([k, label, url]) => `
+          <a class="social social-${k}" href="${esc(url)}" target="_blank" rel="noopener noreferrer" title="${label}">
             <span class="social-ico">${ICONES[k]}</span>
             <span>${label}</span>
           </a>`).join('');
