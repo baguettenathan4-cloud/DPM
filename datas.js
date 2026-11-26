@@ -17,10 +17,10 @@ const PORTFOLIO_DATA = {
   },
   "about": "Musicien depuis l'enfance, don patient muyumba est un jeune artiste évoluant dans la ville de Lubumbashi issu d'une mère congolaise et d'un père congolais\npatient muyumba dont son nom artistique est connu sous l'appellation de DON PATIENT MUYUMBA.\nDon patient muyumba est un homme passionné par la musique chrétienne dans laquelle il a fait plusieurs œuvres ",
   "socials": {
-    "youtube": "DON patient muyumba TV",
+    "youtube": "https://www.youtube.com/@patientmuyumba-fx9mc",
     "spotify": "",
-    "instagram": "Don patient muyumba",
-    "facebook": "Don patient muyumba",
+    "instagram": "https://www.instagram.com/don_patient_muyumba",
+    "facebook": "https://www.facebook.com/DonPatientMyumba",
     "website": ""
   },
   "domaines": [
